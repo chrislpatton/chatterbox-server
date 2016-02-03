@@ -13,9 +13,11 @@ $(document).on('ready', function(){
     
     chatroom: 'lobby',
     
-    server: 'https://api.parse.com/1/classes/chatterbox',
+    server: 'http://127.0.0.1:3000/classes/chatterbox',//'https://api.parse.com/1/classes/chatterbox',
     
     friends:{},
+    
+    lastMessageId: 0,
       
   
   //===============================================================
@@ -32,13 +34,22 @@ $(document).on('ready', function(){
         success: function (data) {
           console.log('chatterbox: Message sent. Data: ', data);
           //get the data for the room names
+      
+      var mostRecentMessage = data.results[data.results.length-1];
+          var displayedRoom = $('.chat span').first().data('roomname');
+          if (mostRecentMessage.objectId !== app.lastMessageId || app.roomname !== displayedRoom){
+          
           app.getRoomData(data.results);
+      
           //get the message data
           app.getMessages(data.results);
+          // store recent messages
+          app.lastMessageId = mostRecentMessage.objectId;
+        }
         },
         error: function (data) {
           // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-          console.error('chatterbox: Failed to send message. Error: ', data);
+          //console.error('chatterbox: Failed to send message. Error: ', data);
         }
       });
     },
@@ -115,7 +126,7 @@ $(document).on('ready', function(){
     addRoom: function(roomname){
       $option = $('<option></option>').val(roomname).text(roomname);
       app.$roomSelect.append($option);
-      console.log(roomname);
+      //console.log(roomname);
     },
     
     
